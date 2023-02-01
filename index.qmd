@@ -1,0 +1,10 @@
+---
+title: "Vinicius Lima"
+format: html
+toc: true
+fontsize: 13pt
+---
+
+---
+
+I'm currently a postdoctoral researcher at [Insper](https://www.insper.edu.br/en/) in São Paulo, Brazil.

@@ -2,9 +2,23 @@
 title: "Vinicius Lima"
 format: html
 toc: true
-fontsize: 13pt
+fontsize: 12pt
 ---
 
----
+[`vinicius.gomes.lima [at] alumni.usp.br`](mailto:vinicius.gomes.lima@alumni.usp.br)
 
+------------------------------------------------------------------------
+
+::: columns
+::: {.column width="75%"}
 I'm currently a postdoctoral researcher at [Insper](https://www.insper.edu.br/en/) in São Paulo, Brazil.
+:::
+
+::: {.column width="5%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="20%"}
+![](img/foto_eesp.jpg){fig-align="center" width="150"}
+:::
+:::

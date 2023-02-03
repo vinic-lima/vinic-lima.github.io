@@ -1,6 +1,6 @@
 {
     "id": "FBF08096",
-    "path": "C:/Dropbox/academic/website/vinic-lima.github.io/personal-website/index.qmd",
+    "path": "C:/Dropbox/academic/website/vinic-lima.github.io/docs/index.qmd",
     "project_path": "index.qmd",
     "type": "quarto_markdown",
     "hash": "0",
@@ -17,7 +17,7 @@
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
         "rmdVisualModeLocation": "19:362.7509765625",
-        "cursorPosition": "6,4",
+        "cursorPosition": "11,0",
         "scrollLine": "4"
     },
     "folds": "",

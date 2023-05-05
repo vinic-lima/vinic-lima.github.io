@@ -8,8 +8,6 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: research.qmd  
-        text: Research
       - href: cv.qmd
         text: CV
       
@@ -17,7 +15,6 @@ format:
   html:
     theme: flatly
     css: styles.css
-    toc: true
     fontsize: 1em
 
 editor: visual

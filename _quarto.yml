@@ -1,6 +1,5 @@
 project:
   type: website
-  output-dir: docs
 
 website:
   title: "Vinicius Lima"
@@ -8,14 +7,16 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - research.qmd  
       - href: cv.qmd
         text: CV
       
 format:
   html:
-    theme: flatly
+    theme: simplex
     css: styles.css
-    fontsize: 1em
+    toc: true
+    fontsize: 0.9em
 
 editor: visual
 

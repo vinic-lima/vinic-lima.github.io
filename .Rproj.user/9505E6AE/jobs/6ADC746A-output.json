@@ -30,3 +30,7 @@
 [1,"GET: /\n"]
 [1,"GET: /research.html\n"]
 [1,"GET: /\n"]
+[1,"GET: /research.html\n"]
+[1,"pandoc \n  to: html\n  output-file: index.html\n  standalone: true\n  section-divs: true\n  html-math-method: mathjax\n  wrap: none\n  default-image-extension: png\n  css:\n    - styles.css\n  toc: true\n  \nmetadata\n  document-css: false\n  link-citations: true\n  date-format: long\n  lang: en\n  editor: visual\n  theme: simplex\n  fontsize: 0.9em\n  title: Vinicius Lima\n  \n"]
+[1,"Output created: docs\\index.html\n\nWatching files for changes\n"]
+[1,"GET: /\n"]

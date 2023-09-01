@@ -3,7 +3,7 @@
     "path": "C:/Dropbox/academic/website/vinic-lima.github.io/_quarto.yml",
     "project_path": "_quarto.yml",
     "type": "yaml",
-    "hash": "2484848157",
+    "hash": "1687123518",
     "contents": "",
     "dirty": false,
     "created": 1693564187892.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "2,18",
+        "cursorPosition": "5,10",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1693564207,
+    "lastKnownWriteTime": 1693564676,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1693564207000,
+    "last_content_update": 1693564676057,
     "read_only": false,
     "read_only_alternatives": []
 }

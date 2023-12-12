@@ -2,10 +2,6 @@
 
 ## Work in Progress
 
-### **Domestic Violence Law Enforcement and Women's Labor Market Participation**
-
-This paper uses Brazilian data to investigate the effects of a policy aimed at enforcing the combat against domestic violence on women's labor market participation in a difference-in-differences framework. While the primary objective is combatting domestic violence, it also redistributes bargaining power to women, placing them in a stronger position to implement their preferred allocation. The main finding indicates that a 60\\% decrease in the average distance of married women to a police station would lead to a 2.7\\% increase in their participation in the labor market. The effects are primarily driven by educated women, who are likely to have higher initial bargaining power. I show supporting evidence of reduced women's hospitalization due to violence and that reporting of crimes related to domestic violence responded consistently. These findings shed light on the interplay between law enforcement, household dynamics, and labor market outcomes.
-
 ### **Peer Effects in Active Learning**
 
 with Vladimir Ponczek and Priscilla Tavares
@@ -23,3 +19,6 @@ In this paper, we look to elections and local governments in Brazil to analyze h
 with Eduardo Ferraz
 
 This paper studies the impact of a reform that limited the maximum number of candidates in electoral coalitions disputing local legislative elections in Brazil. The reform targeted municipalities with more than 100,000 voters, allowing us to use a difference-in-differences design to estimate its effects on the entry of candidates and political selection. The reform increased political competition by raising the number of effective coalitions by 12.2%. This attracted better-educated candidates and consequently elected legislators were 34.5% richer, on average. No significant change was found in the amount of money spent in the election. However, there is modest evidence that resources were redirected to the legislative elections. Finally, although there is a 4% increase in total revenues we find no effect on policy spending. These results provide evidence of a causal link between electoral rules and political selection through a rearrangement of electoral coalitions.
+
+### **Domestic Violence Law Enforcement and Women's Labor Market Participation**
+

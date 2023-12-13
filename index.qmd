@@ -2,18 +2,18 @@
 title: "Vinicius Lima"
 ---
 
+------------------------------------------------------------------------
+
 ::: columns
-::: {.column width="27%"}
-![](foto_eesp_1.jpg){fig-align="center" width="194"}
+::: {.column width="24%"}
+![](foto_eesp_1.jpg){fig-align="center" width="141"}
 :::
 
-::: {.column width="13%"}
+::: {.column width="5%"}
 :::
 
-::: {.column width="60%"}
+::: {.column width="71%"}
 I'm a post-doctoral researcher at [Insper](https://www.insper.edu.br/en/) in São Paulo, Brazil.
-
-My main research project currently examines the potential effects of a policy intended to reduce domestic violence on women's labor market outcomes. This research in [financed](http://bv.fapesp.br/pt/bolsas/207019/) by the São Paulo Research Foundation (FAPESP).
 
 I have a broad interest in topics of development economics with a focus on education, labor, and political economy.
 
@@ -22,7 +22,6 @@ I have a broad interest in topics of development economics with a focus on educa
 My email address is [`vinicius.gomes.lima [at] alumni.usp.br`](mailto:vinicius.gomes.lima@alumni.usp.br).
 :::
 :::
-
 
 ## Work in Progress
 

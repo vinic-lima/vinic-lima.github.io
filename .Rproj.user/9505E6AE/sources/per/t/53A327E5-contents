@@ -4,14 +4,14 @@ project:
 
 website:
   title: ""
-  navbar: false
       
 format:
   html:
     theme: simplex
     css: styles.css
-    toc: true
-    fontsize: 0.9em
+    toc: false
+    fontsize: 14pt
+    mainfont: Sans Serif
     
 
 editor: visual

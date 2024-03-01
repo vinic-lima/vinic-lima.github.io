@@ -1,0 +1,10 @@
+---
+title: "Customing regression tables in Stata"
+description: "This post show how one can include auxiliary estimates and statistics in an output table ready to be saved in a tex file."
+author: "Vinicius Lima"
+date: "5/23/2021"
+categories:
+  - Stata
+  - Latex
+  - Making tables
+---

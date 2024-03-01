@@ -1,0 +1,10 @@
+---
+title: "Workflow to produce tables in R"
+description: "This post show how to set an efficient workflow to expory any estimation output and other tables to a tex file."
+author: "Vinicius Lima"
+date: "5/23/2021"
+categories:
+  - R
+  - Latex
+  - Making tables
+---

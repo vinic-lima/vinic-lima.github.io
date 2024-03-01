@@ -1,9 +1,35 @@
 ---
-title: "About"
+title: ""
+about:
+  id: hero-heading
+  template: trestles
+  image: img/me_guitar.jpg
+  image-width: 14em
+  image-shape: rounded
 ---
 
-About this site
+::: {#hero-heading}
+## Education
 
-```{r}
-1 + 1
-```
+#### São Paulo School of Economics, FGV (Brazil)
+
+PhD in Economics, 2017 - 2021
+
+M.A. in Economics, 2015 - 2017
+
+#### University of São Paulo (Brazil)
+
+B.A in Economics, Sept 2009 - 2013
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="80%"}
+Although I'm a professional economist, until today, I certainly have spent most of my time playing the guitar.
+
+More recently, I also tried [photography](https://photos.app.goo.gl/hQJkG7EBM4zu2bjt5), and as you can see in some of the photographs I took, I have two dogs named Jeff and Pierre.
+:::
+
+::: {.column width="10%"}
+:::

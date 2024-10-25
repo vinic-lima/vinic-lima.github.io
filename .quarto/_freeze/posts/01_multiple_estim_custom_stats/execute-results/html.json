@@ -1,0 +1,16 @@
+{
+  "hash": "139f3582fc0562b709c5ef02af69ebfd",
+  "result": {
+    "markdown": "---\ntitle: \"Multiple estimation with custom statistics\"\nauthor: \"Vinicius Lima\"\nformat: html\neditor: visual\n---\n\n\n## Quarto\n\nQuarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.\n\n## Running Code\n\nWhen you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:\n\n\n::: {.cell}\n\n```{.r .cell-code}\nhist(rnorm(1000))\n```\n\n::: {.cell-output-display}\n![](01_multiple_estim_custom_stats_files/figure-html/unnamed-chunk-2-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "01_multiple_estim_custom_stats_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

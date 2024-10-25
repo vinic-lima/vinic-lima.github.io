@@ -1,0 +1,124 @@
+---
+title: "Multiple estimation with custom statistics"
+author: "Vinicius Lima"
+format: html
+editor: visual
+project-dir: "C:/Dropbox/academic/website/vinic-lima.github.io/posts"
+---
+
+## The Problem
+
+I have a dataset with two outcomes, `y1` and `y2`, and two treatment variables, `T1` and `T2`:
+
+```{r, echo=T, warning=FALSE, message=FALSE}
+df_data <- readRDS('001_files/001_data.rds')
+
+head(df_data)
+
+summary(df_data)
+
+```
+
+I want to estimate the effect of each treatment on each outcome, running 4 regressions. Additionally, I want to report the mean outcome among control units for each case. This is tricky because the estimation sample varies by treatment.
+
+We'll solve this using the packages *fixest*, *modelsummary*, and *dplyr*.
+
+## Solution
+
+The `feols` function provides a one-line solution to run the four regressions and store the results in a list.
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(fixest)
+library(modelsummary)
+
+my_estimation <- feols(data = df_data, fml = c(y1,y2) ~ sw(T1, T2))
+
+modelsummary(my_estimation, gof_map = 'nobs')
+```
+
+A manual solution would involve calculating the control means and adding a row to the output table using `modelsummary` tools.
+
+However, I want to automate this to avoid manual errors, especially as more models are estimated.
+
+Thus, I'll develop a function to append the mean control outcome to the `modelsummary` output.
+
+```{r, warning=FALSE, message=FALSE}
+fn_append_mean <- function(mod_object, estimating_data){
+  
+  # Part 1: Calculate the mean of the dependent variable --------------------
+  
+  # Extract variable names
+  dep_var_name   = all.vars(mod_object$fml_all$linear)[1]
+  treatment_name = all.vars(mod_object$fml_all$linear)[2] # The index might vary depending on the formula
+  
+  # Get the subset of 'estimating_data' used to estimate 'mod_object'
+  used_obs = unlist(mod_object$obs_selection)
+  
+  # Calculate the mean of 'dep_var_name' where 'treatment_name' == 0
+  average = estimating_data[used_obs,] %>%
+    filter(!!sym(treatment_name) == 0) %>%
+    select(!!sym(dep_var_name)) %>%
+    pull() %>%
+    mean()
+  
+  # Part 2: Append the mean as a statistic in the model ---------------------
+  
+  # Convert the model to a 'modelsummary_list' object
+  mod_output = modelsummary(mod_object, output = 'modelsummary_list')
+  
+  # Append the control mean
+  mod_output$glance$control.mean = average
+  
+  return(mod_output)
+  
+}
+
+```
+
+Let's apply the function to one model:
+
+```{r, warning=FALSE, message=FALSE}
+fn_append_mean(mod_object = my_estimation[[1]],
+               estimating_data =   df_data) 
+```
+
+Now, apply the function to all models and format the output statistics:
+
+```{r, warning=FALSE, message=FALSE}
+
+# Apply the function to all models
+my_estimation_append <- lapply(my_estimation, 
+                               fn_append_mean, 
+                               estimating_data = df_data)
+
+# See https://modelsummary.com/articles/modelsummary.html#fmt-round-and-format
+gm <- list(
+  list("raw" = "nobs", "clean" = "N", "fmt" = "%.0f"),
+  list("raw" = "control.mean", "clean" = "Control mean", "fmt" = "%.3f")
+)
+
+modelsummary(my_estimation_append, gof_map = gm)
+
+```
+
+Let's compare with the results from a manual calculation:
+
+```{r, warning=FALSE, message=FALSE}
+df_data %>% 
+  filter(T1 == 0) %>% 
+  summarise_at(c('y1', 'y2'), mean)
+
+df_data %>% 
+  filter(T2 == 0) %>% 
+  summarise_at(c('y1', 'y2'), mean)
+  
+```
+
+**Final Remarks**
+
+-   The `feols` option `data.save` could remove the need to pass `estimating_data`, but I chose not to store unnecessary data.
+-   Ensure that `estimating_data` matches the data used to estimate `mod_object`, or the results will be incorrect.
+-   Be cautious when using the mod_object\$obs_selection object if there are missing values in the dependent variable. In such cases, the output will include both the indices of observations dropped due to NAs and those used in the estimation.
+
+That's it.

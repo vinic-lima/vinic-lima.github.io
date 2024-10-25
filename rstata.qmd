@@ -1,5 +1,5 @@
 ---
-title: "Coding in R and Stata"
+title: "Coding in R, Python and Stata"
 
 listing:
   contents: posts
@@ -13,8 +13,6 @@ It's likely that you won't find any brand new content here compared to what you 
 However, I built this page to serve as a kind of personal library gathering a lot of stuff I did in both R and Stata.
 
 The content is organized into the categories that see in the right bar.
-
-// Should I organize this as a book?
 
 ---
 

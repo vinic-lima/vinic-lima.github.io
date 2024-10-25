@@ -16,6 +16,8 @@ website:
         file: teaching.qmd        
       - text: "About me"
         file: about.qmd
+      - text: "R, Python & Stata Tips"
+        file: rstata.qmd  
     right:
       - icon: envelope
         href: mailto:vinicius.gomes.lima@alumni.usp.br

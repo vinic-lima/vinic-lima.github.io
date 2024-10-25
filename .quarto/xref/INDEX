@@ -25,5 +25,11 @@
   },
   "posts/004_test.qmd": {
     "004_test.html": "607a5eec"
+  },
+  "posts/01_multiple_estim_custom_stats.qmd": {
+    "01_multiple_estim_custom_stats.html": "0be54b23"
+  },
+  "posts/001_multiple_estim_custom_stats.qmd": {
+    "001_multiple_estim_custom_stats.html": "b2eff4e2"
   }
 }

@@ -19,7 +19,7 @@ I have a broad interest in topics of development economics covering education, l
 
 Here you can find information about my research, teaching experience, and some personal information.
 
-CV
+[CV](docs/files/Vinicius_Lima_CV_2024_Nov.pdf)
 :::
 :::
 

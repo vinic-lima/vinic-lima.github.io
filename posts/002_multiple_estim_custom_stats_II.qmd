@@ -1,0 +1,95 @@
+---
+title: "Multiple estimation with custom statistics II"
+author: "Vinicius Lima"
+format: html
+editor: visual
+project-dir: "C:/Dropbox/academic/website/vinic-lima.github.io/posts"
+---
+
+In this post, I tackle the same problem of the [previous post](001_multiple_estim_custom_stats.html), but now I use more direct approach with `fixest`'s `etable` instead of `modelsummary`.
+
+## The Problem
+
+Recall the dataset: there are two outcomes, `y1` and `y2`, and two treatment variables, `T1` and `T2`:
+
+```{r, echo=T, warning=FALSE, message=FALSE}
+df_data <- readRDS('001_files/001_data.rds')
+
+head(df_data)
+
+summary(df_data)
+
+```
+
+I want to estimate the effect of each treatment on each outcome, running 4 regressions.
+
+Additionally, I want to report the mean outcome among control units for each case. This is tricky because the estimation sample varies by treatment.
+
+We'll solve this using the packages *fixest* and *dplyr*.
+
+## Solution
+
+Use `feols` to run the four regressions and store the results.
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(fixest)
+
+my_estimation <- feols(data = df_data, fml = c(y1,y2) ~ sw(T1, T2))
+```
+
+The logic behind the approach is to retrieve the model's design matrix and then find the dependent variable values associated with the control observations. Let's first check how it works with a single model.
+
+```{r}
+
+# The object 'my_estimation' is a list; we must retrieve some of the elements to  work with `model.matrix`
+my_estimation_1 <- my_estimation[lhs = 1, rhs = 1][[1]]
+
+# No, we get the treatment and dependent variables from the design matrix
+t <- model.matrix(my_estimation_1, subset = 'T', type = 'rhs') 
+y <- model.matrix(my_estimation_1, type = 'lhs')
+
+# Find which rows contain the control units
+i <- which(t[,1] == 0)
+
+# Compute the mean of the dependent variable for the control units
+print(mean(y[i]))
+```
+
+**Remark**: I used the argument "subset" to define `t`, but not with `y`. This is because the option "rhs" produces a matrix with all regressors. By using `subset = "T"` I tell the function that I want to keep in `t` only columns whose names match "T". In my case, this is sufficient to get only the treatment variable. Be cautious to ensure that you retrieve the correct variable.
+
+Now, I use the `fitstat_register` function from `fixest` to apply these steps to all regressions and display the computed statistic in the regression table.
+
+We must supply three arguments for this function:
+
+```{r}
+
+fitstat_register(
+  type = "meandepvar", 
+  fun = function(x) {
+    
+    t <- model.matrix(x, subset = 'T', type = 'rhs') 
+    y <- model.matrix(x, type = 'lhs')
+    i <- which(t[,1] == 0)
+    return(mean(y[i]))
+    
+    },
+  alias = "Mean of Dep. Variable"
+  )
+
+```
+
+The argument *type* establishes a name for the statistic, which you will need to refer to when calling it within the table.
+
+Then, we must supply the function that effectively computes the statistic using the objects available from the estimation output.
+
+Finally, the argument *alias* is the text displayed in the regression table.
+
+I now use `etable` to report the regression output, including the desired statistics with the "fitstat" argument. I include our custom "meandepvar" and the number of observations "n".
+
+```{r}
+etable(my_estimation,
+       fitstat = ~ meandepvar + n)
+```
+
+That's it.

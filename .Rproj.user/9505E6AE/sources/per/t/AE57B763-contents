@@ -1,0 +1,580 @@
+library(fixest)
+library(tidyverse)
+library(broom)
+library(modelsummary)
+library(estimatr)
+rm(list = ls())
+
+#'[ Auxiliary function to build the event-study plots ======================== ]
+  
+  fn_plot_event_study <- function(model, mcolor = 'firebrick'){
+    
+    # Extract coefficients using broom's tidy
+    event_study_results = tidy(model, conf.int = TRUE) %>%
+      filter(grepl("^year", term)) %>%
+      mutate(year = str_extract(term, '\\d{4,4}') %>% as.numeric) %>% 
+      add_row(year = 1995, estimate = 0)
+    
+    # Plot the coefficients using ggplot
+    g = event_study_results %>% 
+      ggplot(aes(x = year,
+               y = estimate)) +
+      geom_hline(yintercept = 0, linetype = "solid", color = "black") +
+      geom_vline(xintercept = 1995, linetype = "dashed", color = "gray60") +
+      geom_point(
+        aes(color = case_when(
+          year < 1995 ~ "gray",
+          year > 1995 ~ mcolor,
+          TRUE ~ 'black'))
+      ) +
+      geom_errorbar(aes(
+        ymin = conf.low, ymax = conf.high,
+        color = ifelse(year < 1995, "gray", mcolor)
+      ),
+      width = 0.1, 
+      linewidth = 0.8
+      ) +
+      scale_color_identity()
+    
+    return(g)
+  }
+  
+  custom_theme <- function(...){
+    theme_minimal(base_size = 12) +
+      theme(
+        text = element_text(size = 20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+      ) 
+  }
+  
+  # With the biannual variable
+  fn_plot_event_study2 <- function(model, mcolor = 'firebrick'){
+    
+    # Extract coefficients using broom's tidy
+    event_study_results = tidy(model, conf.int = TRUE) %>%
+      filter(grepl("^t", term)) %>%
+      mutate(t = str_extract(term, '\\d{4,4}-\\d{4,4}')) %>% 
+      add_row(t = '1994-1995', estimate = 0) %>% 
+      mutate_at('t', as.factor)
+    
+    # Plot the coefficients using ggplot
+    g = event_study_results %>% 
+      ggplot(aes(x = t,
+                 y = estimate)) +
+      geom_hline(yintercept = 0, linetype = "solid", color = "black") +
+      geom_vline(xintercept = '1994-1995', linetype = "dashed", color = "gray60") +
+      geom_point(
+        aes(color = case_when(
+          t %in% paste0(seq(1990, 1994, by = 2), "-", seq(1991, 1995, by = 2)) ~ "gray",
+          t %in% paste0(seq(1996, 2004, by = 2), "-", seq(1997, 2005, by = 2)) ~ mcolor,
+          TRUE ~ 'black'))
+      ) +
+      geom_errorbar(aes(
+        ymin = conf.low, ymax = conf.high,
+        color = ifelse(t %in% paste0(seq(1990, 1994, by = 2), "-", seq(1991, 1995, by = 2)), "gray", mcolor)
+      ),
+      width = 0.1, 
+      linewidth = 0.8
+      ) +
+      scale_color_identity()
+    
+    return(g)
+  }
+
+#'[ Auxiliary info & functions for Latex tables ============================= ]
+
+  tab_notes <- c(
+  "\\textit{Notes}: Standard errors are clustered at the justice region level. 
+  Regressions weighted by the region gender-specific population. All models include year and justice region fixed effects.
+  Baseline characteristics from the 1991 Brazilian Census include:
+  schooling profile, per capita income, access to the sewage network,
+  share of urban households, black, female, and married populations.",
+                 "* p $< 0.1$, ** p $< 0.05$, *** p $< 0.01$.")
+  
+  setFixest_dict(dict = c("g" = "No. of Justice Regions",
+                          "rate_homicides_home" = "Homicide rate per 100,000",
+                          "rate_homicides_outhome" = "Homicide rate per 100,000 (out)",
+                          "rate_heart_attack_home" = "Heart Attack at Home per 100,000",
+                          "rate_mpo_lesao" = "Rate of Assault per 100,000 in 1995",
+                          "post" = "Post",
+                          "log(female_employ)" = "Female Employment (log)",
+                          "log(male_employ)" = "Male Employment (log)",
+                          'log(pop_gender)' = 'Population (log)',
+                          'sexo' = 'Gender',
+                          'rate_lesao_top33' = 'Positive & Top 33\\%',
+                          'rate_lesao_mid33' = 'Positive & Mid 33\\%',
+                          'rate_lesao_bottom33' = 'Positive & Bottom 33\\%',
+                          'rate_hospital' = 'Hospitalization rate per 100,000'))
+
+  
+  fitstat_register("meandepvar", 
+                   function(x) mean(model.matrix(x, type = 'lhs')),
+                   "Mean of Dep. Variable")
+
+  # Auxiliary functions to adjust the latex table
+  fn_tex_tab_adjust_1 <- function(tab){
+    tab %>% 
+      sub("Gender","\\\\cmidrule{2-5}\n", .) %>%
+      sub("&.*\\(1)","\\\\cmidrule(lr){2-3}\\\\cmidrule(lr){4-5}\n & (1)",.) %>% 
+      sub("Female","\\\\addlinespace\nFemale", .) %>% 
+      sub("Male","\\\\addlinespace\nMale", .) %>% 
+      sub("Population","\\\\addlinespace\nPopulation", .) %>% 
+      sub("Baseline Var","\\\\addlinespace\nBaseline Var", .) %>% 
+      sub("& \\\\tabularnewline"," ",.) %>% 
+      sub("\\\\tabularnewline"," ",.)
+  }
+  
+  fn_custom_tex <- function(...){
+    style.tex(depvar.title = '\\textit{Dependent variable}:',
+              model.title = ' ',
+              var.title = '\\midrule',
+              stats.title = "\\midrule",
+              line.top = 'simple',
+              line.bottom = 'simple',
+              tablefoot = F,
+              notes.tpt.intro = '[flushleft]\n\\footnotesize')
+  }
+  
+  
+#'[ Input data =============================================================== ]
+  df_data <- readRDS('paper_adr_vaw/data/main_data.rds') %>% 
+    filter(year >= 1992 & pop_comarca_1991 < 200000)
+
+#'[ Paths to export tables & figures ========================================= ]  
+  
+  path_tab <- 'paper_adr_vaw/analysis/text/tables/'
+  path_fig <- 'paper_adr_vaw/analysis/text/figures/'
+  
+#'* ------------------------------------------------------------------------ *
+#'* Table Results ---------------------------------------------------------- *
+#'* ------------------------------------------------------------------------ *
+  
+  tab_controls <- 
+    
+    feols(data = df_data,
+          
+          fml = c(rate_homicides_home, rate_homicides_outhome) ~ 
+            
+            # Treatments
+            sw(
+              
+              # Continuous
+              i(post, rate_mpo_lesao, ref = 0),
+              
+              # Positive Top 33%
+              i(post, rate_lesao_top33, ref = 0),
+              
+              # Positive Top/Bottom 50%
+              i(post, rate_lesao_top33, ref = 0) +
+                i(post, rate_lesao_mid33, ref = 0) + 
+                i(post, rate_lesao_bottom33, ref = 0)
+            ) |  
+            
+            # Fixed-effects
+            id_comarca_amc +
+            year[schooling1_1991, schooling2_1991, schooling3_1991, schooling4_1991,
+                 renda_pc_1991, saneam_rede_1991, urbano_1991,
+                 black_1991,female_1991,married_1991,age_1991, ln_pop_comarca_1991],
+          
+          cluster = ~ id_comarca_amc,
+          
+          weights = ~ pop_gender,
+          
+          split =  ~ sexo)
+  
+  
+  tab_no_controls <- 
+    
+    feols(data = df_data,
+          
+          fml = c(rate_homicides_home, rate_homicides_outhome) ~ 
+            
+            # Treatments
+            sw(
+              
+              # Continuous
+              i(post, rate_mpo_lesao, ref = 0),
+              
+              # Positive Top 50%
+              i(post, rate_lesao_top33, ref = 0),
+              
+              # Positive Top/Bottom 50%
+              i(post, rate_lesao_top33, ref = 0) +
+                i(post, rate_lesao_mid33, ref = 0) + 
+                i(post, rate_lesao_bottom33, ref = 0)
+            ) |
+            
+            # Fixed-effects
+            id_comarca_amc + year,
+          
+          cluster = ~ id_comarca_amc,
+          
+          weights = ~ pop_gender,
+          
+          split =  ~ sexo)
+
+  # file names
+  file_names <- list(
+    
+    home = c('tab_homicides_home_continuous.tex',
+             'tab_homicides_home_top50.tex',
+             'tab_homicides_home_positive.tex'),
+    
+    outhome = c('tab_homicides_outhome_continuous.tex',
+                'tab_homicides_outhome_top50.tex',
+                'tab_homicides_outhome_positive.tex')
+  )
+  
+  tab_title <- c("Effect on the Rate of Homicides \\textit{at} the Victim's Home",
+                 "Effect on the Rate of Homicides \\textit{outside} the Victim's Home")
+  
+  for (j in 1:3) { # Treatment variable
+    
+    for (i in 1:2) { # Outcome
+      
+      etable(
+        
+        # Women
+        tab_no_controls[sample = 2, lhs = i, rhs = j],
+        tab_controls[sample = 2, lhs = i, rhs = j],
+        
+        # Men
+        tab_no_controls[sample = 1, lhs = i, rhs = j],
+        tab_controls[sample = 1, lhs = i, rhs = j],
+        
+        # Table contents
+        extralines = list('Baseline Vars. $\\times$ Year Dummies' = list("No","Yes","No","Yes")),
+        fitstat = ~ meandepvar + g + n + r2,
+        se.row = F,
+        drop.section = c('slopes','fixef'),
+        
+        # Latex options
+        tex = T,
+        tpt = T,
+        notes = tab_notes,
+        powerBelow = -6,
+        title = tab_title[i],
+        style.tex = fn_custom_tex()
+      ) %>% 
+        
+        fn_tex_tab_adjust_1() %>% 
+        
+        writeLines(paste0(path_tab,file_names[[i]][j])) 
+      
+    }
+  }
+  
+  
+#'* -------------------------------------------------------------------------- *  
+#'* Fig Event-study  --------------------------------------------------------- *
+#'* -------------------------------------------------------------------------- *  
+  event_controls <- 
+    
+    feols(data = df_data,
+          
+          fml = c(rate_homicides_home, rate_homicides_outhome) ~ 
+            
+            # Treatments
+            sw(
+              
+              # Continuous
+              i(year, rate_mpo_lesao, ref = 1995),
+              
+              # Positive Top 50%
+              i(year, rate_lesao_top33, ref = 1995)
+              
+              ) |
+            
+            # Fixed-effects
+            id_comarca_amc +
+            year[schooling1_1991, schooling2_1991, schooling3_1991, schooling4_1991,
+                 renda_pc_1991, saneam_rede_1991, urbano_1991,
+                 black_1991, female_1991, married_1991, age_1991, ln_pop_comarca_1991],
+          
+          cluster = ~ id_comarca_amc,
+          
+          weights = ~ pop_gender,
+          
+          split =  ~ sexo)
+  
+  # File names
+  file_names <- list(
+    
+    home = c('fig_event_homicides_home_continuous',
+             'fig_event_homicides_home_top50'),
+    
+    outhome = c('fig_event_homicides_outhome_continuous',
+                'fig_event_homicides_outhome_top50')
+  )
+  
+  for (j in 1:2) { # Treatment variable
+    
+    for (i in 1:2) { # Outcome
+      
+      # Make event-study plots
+      w_estimate <- event_controls[sample = 2, lhs = i, rhs = j][[1]] # Women
+      m_estimate <- event_controls[sample = 1, lhs = i, rhs = j][[1]] # Men
+      
+      # The CI for men's estimates are always larger.
+      # I use it as reference to display men/women in the same scale
+      limits <- m_estimate %>% 
+        tidy(conf.int = T) %>% 
+        summarise(conf.low = min(conf.low),
+                  conf.high = max(conf.high)) %>% 
+        ungroup() %>% 
+        as.matrix() %>% 
+        as.vector()
+      
+      # Women -------------------------------------------------------------------- #
+      w_estimate %>% 
+        
+        fn_plot_event_study(mcolor = 'black') +
+        
+        ylim(limits) +
+        labs(
+          x = ' ',
+          y = ' '
+        )  +
+        custom_theme()
+      
+      ggsave(paste0(path_fig, file_names[[i]][j], '_women.pdf'),
+             width = 8,
+             height = 4.5,
+             dpi = 300)
+      
+      # Men -------------------------------------------------------------------- #
+      m_estimate %>% 
+        
+        fn_plot_event_study(mcolor = 'black') +
+        
+        ylim(limits) +
+        labs(
+          x = ' ',
+          y = ' '
+        )  +
+        custom_theme()
+      
+      ggsave(paste0(path_fig, file_names[[i]][j], '_men.pdf'),
+             width = 8,
+             height = 4.5,
+             dpi = 300)
+      
+    }
+  }
+  
+# Draft --------------------------------------------------------------------
+  df_data <- readRDS('paper_adr_vaw/data/main_data.rds') %>% 
+    filter(pop_comarca_1991 < 200000)
+  
+  dados <- df_data %>% 
+    mutate(polycrime = year*log(ocorrencias),
+           polycrime2 = (year^2)*log(ocorrencias))
+    
+  fn_plot_event_study <- function(model, mcolor = 'firebrick'){
+    
+    # Extract coefficients using broom's tidy
+    event_study_results = tidy(model, conf.int = TRUE) %>%
+      filter(grepl("^year", term)) %>%
+      mutate(year = str_extract(term, '\\d{4,4}') %>% as.numeric) %>% 
+      add_row(year = 1995, estimate = 0)
+    
+    # Plot the coefficients using ggplot
+    g = event_study_results %>% 
+      ggplot(aes(x = year,
+                 y = estimate)) +
+      geom_hline(yintercept = 0, linetype = "solid", color = "black") +
+      geom_vline(xintercept = 1995, linetype = "dashed", color = "gray60") +
+      geom_point(
+        aes(color = case_when(
+          year < 1995 ~ "gray",
+          year > 1995 ~ mcolor,
+          TRUE ~ 'black'))
+      ) +
+      geom_errorbar(aes(
+        ymin = conf.low, ymax = conf.high,
+        color = ifelse(year < 1995, "gray", mcolor)
+      ),
+      width = 0.1, 
+      linewidth = 0.8
+      ) +
+      scale_color_identity()
+    
+    return(g)
+  }
+  
+  custom_theme <- function(...){
+    theme_minimal(base_size = 12) +
+      theme(
+        text = element_text(size = 20),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+      ) 
+  }
+  
+  feols(dados,
+        
+        fml = c(n_homicides_home, rate_homicides_home) ~ 
+          i(post, rate_mpo_lesao, ref = 0) +
+          polycrime + polycrime2 |
+          
+          # Fixed-effects
+          id_comarca_amc + 
+          year[schooling1_1991, schooling2_1991, schooling3_1991, schooling4_1991,
+               renda_pc_1991, saneam_rede_1991, urbano_1991,
+               black_1991,female_1991,married_1991,age_1991, 
+               ln_pop_comarca_1991],
+        
+        cluster = ~ id_comarca_amc,
+        
+        weights = ~ pop_gender,
+        
+        split = ~ sexo) %>% 
+    
+    etable(drop.section = 'slopes')
+  
+  
+  me <- feols(dados,
+              
+              fml = c(n_homicides_home, rate_homicides_home) ~ 
+                i(year, rate_mpo_lesao, ref = 1995) +
+                rate_mpo_lesao +
+                polycrime + polycrime2 + log(pop_1024) |
+                
+                # Fixed-effects
+                id_comarca_amc + 
+                year[schooling1_1991, schooling2_1991, schooling3_1991, schooling4_1991,
+                     renda_pc_1991, saneam_rede_1991, urbano_1991,
+                     black_1991,female_1991,married_1991,age_1991, 
+                     ln_pop_comarca_1991],
+              
+              cluster = ~ id_comarca_amc,
+              
+              weights = ~ pop_gender,
+              
+              split = ~ sexo)
+  
+  me[sample = 2, lhs = 1][[1]] %>% 
+  fn_plot_event_study(mcolor = 'black') +
+
+    labs(
+      x = ' ',
+      y = 'Effect on Homicide at Home',
+      title = 'Event-study estimates',
+      subtitle = 'Women - Rate per 100,000',
+      caption = 'Include log(crime) 2nd order polynomial as control.'
+    )  +
+    custom_theme() 
+  
+  me[sample = 1, lhs = 1][[1]] %>% 
+    fn_plot_event_study(mcolor = 'black') +
+    
+    labs(
+      x = ' ',
+      y = 'Effect on Homicide at Home',
+      title = 'Event-study estimates',
+      subtitle = 'Men - Rate per 100,000',
+      caption = 'Include log(crime) 2nd order polynomial as control.'
+    )   +
+    custom_theme()
+  
+  library(did)
+  #'[ Function to adjust the data and run CS =================================== ]
+  # See: https://bcallaway11.github.io/did/reference/index.html
+  
+  fn_cs_did <- function(dep_var,
+                        treat_var,
+                        sex = 'Women',
+                        controls = NULL){
+    
+    # Data frame ------------------------------------------------------------- #
+    dta <- df_data %>% 
+      
+      # Further sample selection goes here
+      filter(sexo == sex & pop_comarca_1991 < 200000) %>% 
+      
+      # Only the relevant variables for the estimation
+      select(id_comarca_amc, year, pop_gender,
+             all_of(c(dep_var, treat_var, controls))) %>% 
+      
+      # Treated units == 1996, caso contrário == 0
+      mutate(first_treat = case_when(
+        !!sym(treat_var) == 1 ~ 1996,
+        TRUE ~ 0
+      )) %>% 
+      
+      rename(pop_weight = pop_gender)
+    
+    # Whether to include controls -------------------------------------------- #
+    if (!is.null(controls)){
+      
+      # Create the formula
+      controls = as.formula(paste("~ ", paste(controls, collapse = " + ")))
+      
+    }
+    
+    # Estimation ------------------------------------------------------------- #
+    m_output <- att_gt(yname=dep_var,
+                       tname="year",
+                       idname="id_comarca_amc",
+                       gname="first_treat",
+                       base_period = "universal",
+                       xformla= controls,
+                       weightsname = "pop_weight",
+                       clustervars = "id_comarca_amc",
+                       data=dta)
+    
+    return(m_output)
+    
+  }
+  df_data <- df_data %>% 
+    filter(rate_lesao_mid33 == 0 & year > 1992) %>% 
+    mutate(pctile_renda = ntile(renda_pc_1991,4),
+           pctile_pop = ntile(pop_comarca_1991,4),
+           pctile_urb = ntile(urbano_1991,4),
+           pct_school1 = ntile(schooling1_1991, 4),
+           pct_school2 = ntile(schooling2_1991, 4),
+           pct_school3 = ntile(schooling3_1991, 4),
+           pct_school4 = ntile(schooling4_1991, 4))
+  
+  #'[Examples ================================================================== ]  
+  dep_vars <- c('n_homicides_home', 'n_homicides_outhome')
+  treat_vars <- c('b_rate_mpo_lesao','rate_lesao_top33')
+  
+  # Example with no controls
+  dep_var = dep_vars[1]
+  treat_var = treat_vars[2]
+  
+  m_no_control <- fn_cs_did(dep_var,
+                            treat_var)
+  
+  summary(m_no_control)
+  aggte(m_no_control)
+  ggdid(m_no_control)
+  
+  # Men's sample
+  m_no_control <- fn_cs_did(dep_var,
+                            treat_var,
+                            sex = 'Men')
+  
+  ggdid(m_no_control)
+  
+  # Example with controls 
+  control_vars = c('pctile_renda','pctile_pop')
+  
+  m_control <- fn_cs_did(dep_var,
+                         treat_var,
+                         controls = control_vars)
+  
+  summary(m_control)
+  ggdid(m_control)
+  
+  
+  m_control_men <- fn_cs_did(dep_var,
+                             treat_var,
+                             controls = control_vars,
+                             sex = 'Men')
+  
+  summary(m_control_men)
+  ggdid(m_control_men)
+  

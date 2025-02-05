@@ -1,0 +1,45 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Vinicius Lima"
+  navbar: 
+    background: dark
+    foreground: light
+    left: 
+      - text: "Home"
+        file: index.qmd
+      - text: "Research"
+        file: research.qmd
+      - text: "Teaching"
+        file: teaching.qmd        
+      - text: "About me"
+        file: about.qmd
+      - text: "R, Python & Stata Tips"
+        file: rstata.qmd  
+    right:
+      - icon: envelope
+        href: mailto:vinicius.gomes.lima@alumni.usp.br
+  
+  page-footer: 
+    background: secondary
+    right: >-
+      vinicius.gomes.lima at alumni.usp.br  
+    left: >-
+      &#169; 2024 Vinicius Lima  
+
+  
+format:
+  html:
+    theme: lumen
+    css: styles.css
+    toc: false
+    fontsize: 12pt
+    mainfont: system-ui
+    callout-icon: false
+    callout-appearance: minimal
+    
+  
+
+

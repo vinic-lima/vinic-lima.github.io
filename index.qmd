@@ -1,6 +1,6 @@
 ---
 title: "Vinicius Lima"
-subtitle: Post-doctoral researcher at Insper
+subtitle: Assistant Professor at Mackenzie
 about:
   id: hero-heading
   template: solana
@@ -13,7 +13,7 @@ about:
 ::: {.column width="90%"}
 Hi!
 
-I'm a post-doctoral researcher at [Insper](https://www.insper.edu.br/en/) in São Paulo, Brazil.
+I'm an Assistant Professor at [Mackenzie Presbyterian University](https://www.mackenzie.br/en/universidade/meet-the-university) in São Paulo, Brazil.
 
 I have a broad interest in topics of development economics covering education, labor, crime and political economy.
 

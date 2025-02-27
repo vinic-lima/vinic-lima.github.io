@@ -5,8 +5,9 @@ project:
 website:
   title: "Vinicius Lima"
   navbar: 
-    background: dark
-    foreground: light
+    background: "#f5f5f5"
+    foreground: dark
+    linkcolor: black
     left: 
       - text: "Home"
         file: index.qmd
@@ -16,29 +17,31 @@ website:
         file: teaching.qmd        
       - text: "About me"
         file: about.qmd
-      - text: "R, Python & Stata Tips"
-        file: rstata.qmd  
     right:
       - icon: envelope
-        href: mailto:vinicius.gomes.lima@alumni.usp.br
+        href: mailto:vinicius.lima@mackenzie.br
   
   page-footer: 
-    background: secondary
+    background: "#E1001E"
     right: >-
-      vinicius.gomes.lima at alumni.usp.br  
+      vinicius.lima at mackenzie.br  
     left: >-
       &#169; 2024 Vinicius Lima  
 
   
 format:
   html:
-    theme: lumen
+    theme: [lumen, custom.scss]
     css: styles.css
     toc: false
+    linkcolor: "#2E2E2E"
     fontsize: 12pt
     mainfont: system-ui
     callout-icon: false
     callout-appearance: minimal
+    grid:
+      body-width: 900px
+    
     
   
 

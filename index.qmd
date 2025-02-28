@@ -1,6 +1,6 @@
 ---
 title: "Vinicius Lima"
-subtitle: Assistant Professor at Mackenzie
+subtitle: Assistant Professor at Mackenzie Business School
 about:
   id: hero-heading
   template: solana

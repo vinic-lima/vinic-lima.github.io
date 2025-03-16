@@ -14,11 +14,11 @@ details[open]{
 ```
 ## Published Articles
 
-["Group size, member selection, and performance: Evidence from legislative elections in Brazil"](https://authors.elsevier.com/a/1kNXVbZee2UFa), **Economics Letters**, 2025
+["Group size, member selection, and performance: Evidence from legislative elections in Brazil"](https://doi.org/10.1016/j.econlet.2024.112153), **Economics Letters**, 2025
 
 ## Working Papers
 
-["Peer Effects in Active Learning"](files/lima_ponczek_tavares_2024.pdf), with Vladimir Ponczek and Priscilla Tavares
+["Peer Effects in Active Learning"](#), with Vladimir Ponczek and Priscilla Tavares
 
 ["Domestic Violence Law Enforcement and Women's Labor Market Participation"](#)
 

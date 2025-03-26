@@ -24,7 +24,7 @@ details[open]{
 
 ## Work in Progress
 
-"Tit-for-Tat between Legislative and Executive", with Eduardo Ferraz and Lucas Finamor
+"The Causal Effect of Legislative Support on Patronage", with Eduardo Ferraz and Lucas Finamor
 
 "Corruption Disclosure and the Dynamics of Government Coalitions"
 

@@ -4,7 +4,7 @@ subtitle: Assistant Professor at Mackenzie Business School
 about:
   id: hero-heading
   template: solana
-  image: img/foto_square.jpg
+  image: img/foto_square2.jpg
   image-width: 16em
   image-shape: round
 ---
@@ -19,7 +19,7 @@ I have a broad interest in topics of development economics covering education, l
 
 Here you can find information about my research, teaching experience, and some personal information.
 
-[CV](files/Vinicius_Lima_CV_2024_Nov.pdf)
+[CV](https://lattes.cnpq.br/5299047299911294)
 :::
 :::
 

@@ -41,8 +41,24 @@ format:
     callout-appearance: minimal
     grid:
       body-width: 900px
+    default-meta:
+      keywords: [
+      "Vinicius Lima", 
+      "economist in Brazil", 
+      "economics research Brazil", 
+      "Universidade Presbiteriana Mackenzie", 
+      "FGV EESP", 
+      "economic policy research", 
+      "public policy economist", 
+      "political economy Brazil", 
+      "economic research Mackenzie", 
+      "teaching economics", 
+      "applied economics research", 
+      "Vinicius Lima Mackenzie", 
+      "economics professor Brazil"
+    ] 
     
-    
+
   
 
 

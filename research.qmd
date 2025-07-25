@@ -14,7 +14,7 @@ details[open]{
 ```
 ## Published Articles
 
-["Group size, member selection, and performance: Evidence from legislative elections in Brazil"](https://doi.org/10.1016/j.econlet.2024.112153), **Economics Letters**, 2025
+["Group size, member selection, and performance: Evidence from legislative elections in Brazil"](lima_2025.pdf), **Economics Letters**, 2025
 
 ## Working Papers
 
